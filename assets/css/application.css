@@ -1,0 +1,263 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any styles
+ * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
+ * file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+ 
+ /*@import "bootstrap-sprockets";
+ @import "bootstrap";
+ */
+ 
+ html {
+        overflow-y: scroll;
+ }
+ .form-control select{
+	 width:170px;
+ }
+ 
+ body {
+		font-family: Monospace;
+		background-color: #000000;
+		margin: 0px;
+		overflow: hidden;
+		padding-top: 20px;
+		height:auto;
+	}
+
+.back {
+    background-color: #fff;
+  }
+	
+.000000 {
+    background-color: #000000;
+  }
+
+	a:visited{
+		color:#fff;
+	}
+
+	a {
+	    color: #fff;
+	} 
+	a.top_menu {
+		color: hsl(208, 56%, 46%);
+		text-decoration: none;
+	}
+	
+	#d {width: 100%; text-align:center; z-index:1000; }
+
+	.bwrap { }
+	button { font-family:georgia; border:1; background: #000000; color:#fff; cursor:pointer; text-align: left;}
+	/*button:hover { background:#333 !important}*/
+  .btn-success:hover {background:#333 !important}
+  .btn-block:hover {background:#333 !important}
+  
+  .labelbutton {
+    padding: 5px 10px;
+    font-weight: normal;
+  }
+
+  .display { color: #fff}
+
+  .muted { color: #ddd}
+
+  .displayMode { color: #f00}
+
+	/*#category button { color:#fa0 }*/
+	#category {
+		margin-left: -25%;
+	}
+	#control button {color:#fa0}
+
+	a { color: skyblue }
+	.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
+	.highlight { background:orange; color:#fff; }
+
+	span {
+		display: inline-block;
+		width: 60px;
+		float: left;
+		text-align: center;
+	}
+
+	#container {
+		float: left;
+		width: 96%;
+		height: auto;
+	}
+
+
+ .divider-vertical {
+ height: 20px;
+ margin: 0 9px;
+ border-right: 1px solid #fdfefe;
+ }
+
+ .push {
+   height: 75px;
+ }
+ footer {
+ 	border-style: solid;
+    	border-color: red;
+   color: #666;
+   background: #222;
+   padding: 36px 0 29px 0;
+   border-top: 1px solid #000;
+   margin-top:60px;
+ }
+ footer a {
+   text-decoration: none;
+   color: #999;
+ }
+ footer a:hover {
+   text-decoration: none;
+   color: #efefef;
+ }
+
+
+
+ .footer-row2 {
+   border-top:1px solid #333;
+   margin-top:40px;
+   padding: 20px 0px 20px 0px;
+
+ }
+ 
+ 
+ .hide {
+     opacity:0;
+     transition:opacity .5s ease-out;
+ }
+ .show {
+     opacity:1;
+     transition:opacity .5s ease-out;
+ }
+.showhalf {
+     transition:opacity .5s ease-out;
+ }
+ 
+ #about_button{
+   width:auto;
+ }
+ 
+
+ #about_box_bkg {
+     width:100%;
+     height:100%;
+     position:absolute;
+     left:0;
+     top:0;
+     overflow:hidden;
+     z-index:40;
+     background-color:rgba(100,100,100,0.7);
+     pointer-events:none;
+ }
+
+ 
+ #about_box {
+     width:600px;
+     height:600px;
+     position:absolute;
+     right:0px;
+     top:20%;
+     padding:8px;
+     color:#fff;
+     text-align:justify;
+     z-index:100;
+     background-color:rgba(100,100,100,0.9);
+     border-radius:10px;
+     font-size:1.0em;
+     border:black 2px solid;
+     pointer-events:none;
+
+     font-size: 12px;
+ }
+
+ #close_button {
+     position:absolute;
+     right:8px;
+     bottom:8px;
+     
+ }
+
+ #info {
+ 	color: #fff;
+ 	top: 10px;
+ 	width: 100%;
+ 	text-align: left;
+ 	z-index: 100;
+ 	display:block;
+ 	margin-left: 10%;
+ }
+
+ #panel {
+ 	/*border-style: solid;
+    	border-color: red;*/
+ 	background-color:  #000000;
+ 
+ }
+
+ #control{
+ /*  margin-top:400px;*/
+
+ }
+
+ 
+#page-loader {
+  position: absolute;
+  top: 0;
+  bottom: 0%;
+  left: 0;
+  right: 0%;
+  background-color: white;
+  z-index: 99;
+  display: block;
+  text-align: center;
+  width: 100%;
+  padding-top: 25px;
+}
+
+
+#loader {
+    border: 32px solid #f3f3f3;
+    border-top: 32px solid #3498db;
+    animation: spin 1.5s linear infinite;
+
+     width:200px;
+     height:200px;
+     position:absolute;
+     /*left: 50%;*/
+     top:40%;
+     padding:8px;
+     color:#fff;
+     border-radius:50%;
+     pointer-events:none;
+     opacity:0.5;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader_msg {
+     width:200px;
+     height:300px;
+     position:absolute;
+     left:50%;
+     top:20%;
+     color:#3498db;
+     text-align:center;
+     z-index:100;
+     pointer-events:none;
+ }

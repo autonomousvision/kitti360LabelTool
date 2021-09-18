@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="../../static/resource/favicon.ico">
+	<link  rel="stylesheet" href="/assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/application.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <title>Backup Tasks</title>
+</head>
+
+<body>
+
+	<div class="container">
+    
+    <div class="row">
+      <p align="left" class="display">
+      User: {{ user }} | 
+      <a href = "/index"  class="top_menu">Go Back</a>
+      |
+      <a href = "/auth/logout"  class="top_menu">Logout</a>
+      </p> 
+	</div>
+    
+	<div class="col-sm-12 well">
+	{% for l in stamps %}
+		<div  class="row" style="padding-bottom:5px">
+			<div class="col-sm-6">
+			<!--a href="#" onclick="$(this).closest('form').submit()">{{ l['date'] }}</a-->
+			<p>{{ l['date'] }}</p>
+			</div>
+			<div class="col-sm-2">
+			<form method="post" action="../load_task?task_id={{ task }}&curr_user={{ user }}&version_id={{ l['time'] }}&editable=normal&timer_offset={{ timer_offset }}">
+    			<button class="btn btn-success btn-sm" type="submit">Open</button>
+			</form>
+			</div>
+		</div>
+	{% endfor %}
+	</div>
+    
+    </div>
+
+</body>
+</html>

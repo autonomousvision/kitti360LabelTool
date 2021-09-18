@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="../../static/resource/favicon.ico">
+	<link  rel="stylesheet" href="/assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/application.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/awesome-bootstrap-checkbox.css">
+    <title>My Tasks</title>
+</head>
+
+<body>
+    <div class="container">
+    
+    <!--Header-->
+    <div class="row">
+      <p align="left" class="display">
+      User: {{ user }} | 
+      <a href = "/auth/logout"  class="top_menu">Logout</a>
+      </p> 
+	</div>
+    
+    <!--Status Board-->
+	<div class="col-sm-12 well">
+		<h3 id="update_status" class="bg-success" style="display: none"></h3>
+	</div>
+
+	<!--Task Board-->
+	<div class="col-sm-12 well">
+	{% for l in tasks %}
+	<div class="col-sm-11">
+		<h4 style="padding-bottom:5px" class="text-info">{{ l['userid'] }}'s Tasks</h4>
+	</div>
+	<div class="col-sm-1">
+		<form method="post" action="../progress?unit=all">
+			<button class="btn btn-link" type="submit">Progress</button>
+		</form>
+	</div>
+		{% for task in l['tasklist'] %}
+			<div class="row" style="padding-bottom:5px">
+				
+				<!--Task Name-->
+				{% if mode == 'normal' %}
+					{% set width = 7 %}
+				{% elif mode == 'refine' %}
+					{% set width = 6 %}
+				{% endif %}
+				<div class="col-sm-{{width}} {% if task['name'] == prevTask %} bg-danger {% endif %}">{{ task['name'] }}
+				{% if task['editable'] == 'readonly' %} (Read-only) 
+				{% elif task['editable'] == 'playground' %} (Playground)
+				{% endif %}
+				</div>
+
+				<!--Open Button-->
+				<div class="col-sm-1">
+				<form method="post" action="../load_task?task_id={{ task['name'] }}&curr_user={{ l['userid'] }}&editable={{ task['editable'] }}&timer_offset={{task['time']}}">
+					<button class="btn btn-success btn-sm" type="submit" id="open{{ task['name'] }}" {% if task['status'] == 'finished' and task['editable'] == 'normal' %} disabled {% endif %}>Open</button>
+					<!-- {% if task['status'] == 'finished' %} disabled {% endif %}-->
+				</form>
+				</div>
+
+				{% if mode == 'normal' %}
+				<!--Status Dropdown List-->
+				<div class="col-sm-2">
+					<select class="form-control" id="status" value="{{ task['status'] }}" {% if task['editable'] != 'normal' %} disabled {% else %} onchange="change_status(this.options[this.selectedIndex].value, '{{ l['userid'] }}', '{{ task['name'] }}')" {% endif %}>
+						<option {% if task['status'] == 'new' %} selected {% endif %} value = "new">New</option>
+						<option {% if task['status'] == 'ongoing' %} selected {% endif %} value = "ongoing">Ongoing</option>
+						<option {% if task['status'] == 'finished' %} selected {% endif %} value = "finished">Finished</option>
+					</select>
+				</div>
+				
+				<!--Backup Version Button-->
+				<div class="col-sm-1"> 
+	              	<form method="post" action="../backup?task_id={{ task['name'] }}&curr_user={{ l['userid'] }}">
+	              		<button class="btn btn-success btn-sm" type="submit"  id="p{{ task['name'] }}" {% if task['status'] == 'finished' %} disabled {% endif %}>Previous</button>
+	              	</form>
+				</div>		
+				{% elif mode == 'refine' %}
+				<!--Checkboxes for subtasks-->
+				<div class="col-sm-4">
+				    {% for i in range(6) %}
+				    <div class="checkbox checkbox-success checkbox-inline">
+					    <input type="checkbox" id="{{task['name']}}{{i+1}}" value="" {% if i+1 not in subTask %} disabled {% endif %} {% if task['substatus'][i] %} checked {% endif %} onchange="change_substatus(this.checked, '{{ task['name'] }}', {{i+1}})">
+					    <label for="{{task['name']}}{{i+1}}">{{i+1}}</label>
+				    </div>
+				    {% endfor %}
+				</div>
+				{% endif %}
+
+
+                <!--Working Time-->
+                <div class="col-sm-1" >
+                    {% if task['status'] == 'new' %} <p class="text-muted" align="left"  id="timer{{ l['userid'] }}{{task['name']}}" ></p> 
+                    {% elif task['status'] == 'ongoing' %}<p class="text-danger"  align="left" id="timer{{ l['userid'] }}{{task['name']}}" ></p> 
+                    {% elif task['status'] == 'finished' %}<p class="text-success"  align="left" id="timer{{ l['userid'] }}{{task['name']}}" ></p>   
+                    {% endif %}
+                </div>
+                <script type="text/javascript">
+			        var m = Math.floor({{task['time']}} / 60) % 60;
+			        var h = Math.floor({{task['time']}} / 3600);
+			        var timer =  ('00'+ h).slice(-2) + ':' + ('00'+ m).slice(-2); 
+			        document.getElementById("timer{{ l['userid'] }}{{task['name']}}").innerHTML = timer;
+                </script>
+				
+
+				<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+				<script type="text/javascript">
+
+					// set the status value
+					function change_status(value, userId, taskId) 
+					{
+						$("#update_status").html("Status Updated!");
+						$("#update_status").delay(100).fadeIn();
+						$('[id="timer'+userId+taskId+'"]').prop('class', "text-success");
+						if (value == 'finished') {
+							// disable the open button
+							$("#open"+taskId).prop('disabled', true);
+							$("#p"+taskId).prop('disabled', true);
+						}
+						else {
+							// disable the open button
+							$("#open"+taskId).prop('disabled', false);
+							$("#p"+taskId).prop('disabled', false);
+                            if (value == 'ongoing') {
+                                    $('[id="timer'+userId+taskId+'"]').prop('class', "text-danger");
+                            }
+                            else {
+                                    $('[id="timer'+userId+taskId+'"]').prop('class', "text-muted");
+                            }
+						}
+
+						$.ajax({
+							url: '../change_status',
+							type: 'POST',
+							data: {'task_id': taskId, 'user_id': userId, 'status': value},
+							datatype: 'html',
+							 success: function(response){
+                               	$("#update_status").delay(500).fadeOut();
+                             },
+                             error: function(response) {
+                               alert('Fail!');  
+                             }
+						});
+
+						$('#status_form').submit();
+
+					}
+
+					function change_substatus(value, taskId, subtask){
+						$.ajax({
+							url: '../change_substatus',
+							type: 'POST',
+							data: {'task_id': taskId, 'status': value, 'subtask': subtask},
+							datatype: 'html',
+							success: function(response){
+                             				},
+                             				error: function(response) {
+                             				  	alert('Fail!');  
+                             				}
+						});
+
+					}
+
+				</script>
+			
+			</div>
+
+		{% endfor %}
+	{% endfor %}
+
+	</div>    
+    </div>
+
+
+    <script type="text/javascript">
+    
+    	// Show result saved
+    	if ('{{ prevTask }}' != 'None') {
+    		$("#update_status").html("Result Saved!");
+    		$("#update_status").delay(100).fadeIn();
+    		$("#update_status").delay(500).fadeOut();
+    	}
+
+    </script>
+
+</body>
+</html>
+ 

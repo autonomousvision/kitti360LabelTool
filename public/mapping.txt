@@ -1,0 +1,12 @@
+grass ground
+soil ground
+stone ground
+bush vegetation
+tree vegetation
+van car
+lightpole bigPole
+electricpole bigPole
+light lamp
+signpole smallPole
+columnpole smallPole
+sign trafficSign

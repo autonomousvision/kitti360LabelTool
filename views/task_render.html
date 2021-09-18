@@ -1,0 +1,500 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<link rel="icon" href="../../static/resource/favicon.ico">
+<link  rel="stylesheet" href="/assets/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="/assets/css/application.css">
+</head>
+
+<body>
+
+<!--include file="header.html"-->
+
+<div class="container">
+
+<div class="row top_menu" style="width:85%;color:#fff;">
+      <p align="left" style="display:inline" id="user_name">User: {{ user }} | </p>
+      <a href = "/index?{% if editable == 'normal' %}curr_task={{ task }}{% else %}curr_task=None{% endif %}" id="save_user" class="top_menu">Save & View Tasks</a>
+      <!--a href = "/index?curr_task={{ task }}" id="save_user" class="top_menu">Save & View Tasks</a-->
+      {% if editable == 'readonly' %} <p align="left" style="display:inline"> | </p> 
+      <p align="left" style="display:inline" class="text-danger"> Read Only Mode </p>
+      {% elif editable == 'playground' %} <p align="left" style="display:inline"> | </p> 
+      <p align="left" style="display:inline" class="text-danger"> Playground Mode </p> 
+      {% endif %}
+      <p align="right" style="display:inline" class="top_menu" id="frame_id"> </p> 
+      <span style="display:inline;float:right" id="timer"></span>
+</div>
+
+<div id="render_messages">
+	<div id="about_box_bkg" class="hide"></div>
+	<div class="row">
+		<div>
+			<div id="display" style="width: 85%; left: 0%; position: relative" >
+				<table width="100%">
+				  <tr>
+				    <td id="status" class=" text-info small"></td>
+				    <td width="45%" id="mode" class=" text-warning small"></td>
+				  </tr>
+				</table>
+			</div>
+
+			<div id="d">
+				<div id="category" class="bwrap">
+						<table id="labelCateogy" style="width: 68%; left: 18%; position: relative"></table>
+						<table id="drawTool" style="width: 68%; left: 18%; position: relative; margin-top: 2px"></table>
+				</div>
+			</div>
+
+			<div id="page-loader">
+				<h3>Loading page...</h3>
+				<img src="/static/resource/loaderPic.gif" alt="loader" />
+				<p>Wait ... </p><br />
+			</div>
+
+		</div>
+
+	<div class="row">
+	  <!--div id="containers"-->
+
+	    <div class="col-sm-10">
+		<div id="container1"></div>
+		<div id="feedback", class="hide" style="pointer-events: none;">
+			<div class="loader_msg">
+			<h2><font style="font-family:verdana; font-size:36px;"><b>Calculating ......</b></font></h2>
+			<div id="loader"></div>
+		</div>
+		</div>
+		</div>
+
+		  <div class="col-sm-2">
+		    <div class="row"><div id="panel"></div></div>
+
+		    <div class="row">
+	         <div id="about_box" class="hide" style="pointer-events: none;">
+	               <h2><font size="4">Keyboard Short Cuts</font></h2>
+	             	<h2><font size="4">Controls</font></h2>
+	         		  "W" translate | "E" rotate | "R" scale <br />
+	         		  Double click to select the annotation.  <br />
+	         		  Press "Delete" to delete the annotation <br />
+	         		  Press Space bar or Enter to confirm current annotation. <br />
+	         		  Press "P" to copy the current shape. <br />
+	         		  Press "S" to centralize the current shape. <br />
+	         		  Press "D" to reset the centralization. <br />
+	         		  Press "D" to reset the centralization. <br />
+	         		  Press "Q" to rotate annotation orientation. <br />
+	         		  Press "U" to update ground stuff annotation in Plannar Stuff mode. <br />
+	         		  Press "-" to delete control points of ground stuff annotation. <br />
+	         		  Press "=" to add control points of ground stuff annotation. <br />
+	         		  Press "Shift" to stop drawing curve for dynamic annotation. <br />
+	         		  Click "Save and View Tasks" to submit your annotation. <br />
+	         		  <h2><font size="4">Visualization</font></h2>
+	         		  Press "A" to toggle to show the annotation. <br />
+	         		  Press "V" to toggle to show orthographic view. <br />
+	         		  Press "F" to visualize annotated points (Go to last color mode). <br />
+	         		  Press "G" to go to the next color mode. <br />
+	         		  Press "J" to show the next class of primitives under dispMode = 6. <br />
+	         		  Press "K" to show the previous class of primitives under dispMode = 6. <br />
+	         		  Press "Page up/down" to slide timestamps (for dynamic annotation). <br />
+	         		  <br />
+	         		  About: Version 3.0
+	         	    <div id="close_button"><a href="#" onclick="show_about(false);"><img src="/static/resource/close.png"></a></div>
+	         </div>
+	       </div>
+		  </div>
+		<!--/div-->	
+	</div>
+	</div>
+</div>
+
+</div> <!-- /container -->
+
+
+
+
+
+<!--div id="bottomMsg" class="display"style="height:20px;width:300px;color:#fff;font-family: Monospace;">
+</div>
+<div id="versionMsg" class="display"style="height:20px;color:#fff;float:right;font-family: Monospace;"></div-->
+
+<div>
+<table width="100%">
+<tr>
+	<td id="bottomMsg" class="display" style="height:20px;width:300px;color:#fff;font-family: Monospace"></td>
+	<td width="45%" id="versionMsg" class="display" style="height:20px;color:#fff;font-family: Monospace;text-align: right;" ></td>
+</tr>	
+</table>
+</div>
+  
+
+
+<script type="x-shader/x-vertex" id="vertexshader">
+
+	uniform float size;
+	uniform float threshold_max;
+	uniform float threshold_min;
+	uniform float jet_max;
+	uniform float jet_min;
+	uniform float timestamp_center;
+	uniform float timestamp_winsize;
+
+	uniform int densePcdOn;
+	uniform int slidingPcdOn;
+	uniform int hideAnnPcdOn;
+	uniform int filterOn;
+	uniform int jetMode;
+	uniform vec3 center;
+	uniform vec3 dir;
+	uniform float radius;
+	uniform float a, b;
+
+	attribute vec3 customColor;
+	attribute vec3 cartoonColor;
+	attribute float zVar;
+	attribute float timestamp;
+	attribute float insideCube;
+
+	varying vec3 vColor;
+	varying float vAlpha;
+
+	vec4 getColor(float v, float vmin, float vmax) {
+
+		vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
+	   	float dv;
+
+		if (v < vmin)
+		  v = vmin;
+		if (v > vmax)
+		  v = vmax;
+		dv = vmax - vmin;
+
+		if (v < (vmin + 0.25 * dv)) {
+		  color.x = 0.0;
+		  color.y = 4.0 * (v - vmin) / dv;
+		} else if (v < (vmin + 0.5 * dv)) {
+		  color.x = 0.0;
+		  color.z = 1.0 + 4.0 * (vmin + 0.25 * dv - v) / dv;
+		} else if (v < (vmin + 0.75 * dv)) {
+		  color.x = 4.0 * (v - vmin - 0.5 * dv) / dv;
+		  color.z = 0.0;
+		} else {
+		  color.y = 1.0 + 4.0 * (vmin + 0.75 * dv - v) / dv;
+		  color.z = 0.0;
+		}
+
+		return(color);
+	}
+
+	// r,g,b values are from 0 to 1
+	// h = [0,360], s = [0,1], v = [0,1]
+	//	if s == 0, then h = -1 (undefined)
+	vec3 rgb2hsv(vec3 rgbValue)
+	{
+	    float r = rgbValue.x;
+	    float g = rgbValue.y;
+	    float b = rgbValue.z;
+
+	    float minChannel = min(r, min(g, b));
+	    float maxChannel = max(r, max(g, b));
+
+	    float h = -1.0;
+	    float s = 0.0;
+	    float v = maxChannel;
+
+	    float delta = maxChannel - minChannel;
+
+	    if (delta != 0.0)
+	    {
+	        s = delta / v;
+
+	        if (r == v) h = (g - b) / delta;
+	        else if (g == v) h = 2.0 + (b - r) / delta;
+	        else if (b == v) h = 4.0 + (r - g) / delta;
+
+	        h *= 60.0;
+	        if ( h < 0.0) h += 360.0;
+	    }
+
+
+	    return vec3(h, s, v);
+	}
+
+	vec3 hsv2rgb(vec3 hsvValue)
+	{
+	    vec3 rgbValue = vec3(1.0, 1.0, 1.0);
+
+	    float h = hsvValue.x;
+	    float s = hsvValue.y;
+	    float v = hsvValue.z;
+
+	    h /= 60.0;
+	    float i = floor(h);
+	    float f = h - i;
+
+	    float p = v*(1.0 - s);
+	    float q = v*(1.0 - s * f);
+	    float t = v*(1.0 - s * (1.0 - f));
+
+	    if (i == 0.0) { rgbValue = vec3(v, t, p); }
+	    else if (i == 1.0) { rgbValue = vec3(q, v, p); }
+	    else if (i == 2.0) { rgbValue = vec3(p, v, t); }
+	    else if (i == 3.0) { rgbValue = vec3(p, q, v); }
+	    else if (i == 4.0) { rgbValue = vec3(t, p, v); }
+	    else /* i == -1 */ { rgbValue = vec3(v, p, q); }
+
+	    return vec3(rgbValue.x, rgbValue.y, rgbValue.z);
+	}
+
+	vec3 reColoring(vec3 srcColor, float a, float b) 
+	{
+		vec3 desColor = vec3(srcColor.r, srcColor.g, srcColor.b);
+		//float gray = (srcColor.r + srcColor.g + srcColor.b)/3.0;
+		// desColor.r = (desColor.r - min(0.9, gray))*a + b;
+		// desColor.g = (desColor.g - min(0.9, gray))*a + b;
+		// desColor.b = (desColor.b - min(0.9, gray))*a + b;
+
+		desColor.r = desColor.r*a + b;
+		desColor.g = desColor.g*a + b;
+		desColor.b = desColor.b*a + b;
+
+		desColor.r = min(max(desColor.r, 0.0), 1.0);
+		desColor.g = min(max(desColor.g, 0.0), 1.0);
+		desColor.b = min(max(desColor.b, 0.0), 1.0);
+
+		return desColor;
+	}
+
+	float mapValue(float zMax, float zMin) {
+		return (0.75*zMax + 0.25*zMin);
+	}
+
+	void main() {
+
+		// jet mode
+		if (jetMode == 1) {
+			vec4 color;
+			if (filterOn == 1 ) {
+				color = getColor(position.z, mapValue(jet_min, jet_max), mapValue(jet_max, jet_min));
+			}
+			else {
+				color = getColor(position.z, threshold_min, /*mapValue(threshold_min, threshold_max),*/ mapValue(threshold_max, threshold_min)); 
+			}
+			vColor.x = color.x;
+			vColor.y = color.y;
+			vColor.z = color.z;	
+		}
+		// z_value mode
+		else if (jetMode == 2) {
+			vec4 color;
+			color = getColor(zVar, 0.3, 1.0); 
+			vColor.x = color.x;
+			vColor.y = color.y;
+			vColor.z = color.z;	
+		}
+		// default color mode
+		else if (jetMode == 0)
+		{
+			// option 1:
+			vColor = customColor;
+			
+			// option 2
+			// vec3 hsv = rgb2hsv(customColor);
+			// hsv.y += 0.25;
+			// vColor = hsv2rgb(hsv);
+			
+			// option 3
+			//vColor = reColoring(customColor, a, b) ;
+		}
+		// cartoon color mode
+		else if (jetMode == 3)
+		{
+			vColor = cartoonColor;
+		}
+
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+
+	 	if (position.z > threshold_max || position.z < threshold_min) {
+	 		vAlpha = 0.0;
+	 	}
+		else if (slidingPcdOn > 0 && ( timestamp>=(timestamp_center+timestamp_winsize*0.5) || timestamp<(timestamp_center-timestamp_winsize*0.5))) {
+			vAlpha = 0.0;
+		}
+		else if (densePcdOn == 0 && timestamp!=floor(timestamp)) {
+			vAlpha = 0.0;
+		}
+		else if (slidingPcdOn == 1 && densePcdOn == 1 && timestamp==floor(timestamp)) {
+			vAlpha = 0.0;
+		}
+
+	 	else if (filterOn > 0 )
+	 	{
+	 		float dist = (center.x - position.x)*(center.x - position.x) + (center.y - position.y)*(center.y - position.y) + (center.z - position.z)*(center.z - position.z);
+	 		vec3 s = vec3(position.x - center.x, position.y - center.y, position.z - center.z);
+	 		float dotProduct = s.x*dir.x + s.y*dir.y + s.z*dir.z;
+
+	 		if (dist > radius*radius) {
+ 				vAlpha = 0.0;
+	 		}
+ 			else {
+ 				vAlpha = 1.0;
+ 			}
+ 		}
+		
+		else if (hideAnnPcdOn > 0 && insideCube > 0.0){
+			vAlpha = 0.0;
+		}
+
+	 	else {
+	 		vAlpha = 1.0;
+	 	}
+
+	 	gl_PointSize = size;
+	}
+
+</script>
+
+
+<script type="x-shader/x-fragment" id="fragmentshader">
+
+	uniform vec3 color;
+	uniform float fakeLight;
+
+	varying vec3 vColor;
+	varying float vAlpha;
+	//varying vec3 vNormal;
+
+	void main() {
+		gl_FragColor = vec4( color * vColor * fakeLight, vAlpha );
+		if ( gl_FragColor.a < ALPHATEST ) discard;
+	}
+
+</script>
+
+
+ <script type="x-shader/x-vertex" id="vertexShaderFisheye">
+      varying vec2 vUv;
+      void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+	</script>
+
+
+  <script type="x-shader/x-fragment" id="fragmentShaderFisheye">
+
+      uniform sampler2D texture;
+      varying vec2 vUv;
+      uniform vec2 sizeVirtual, focalVirtual, offsetVirtual;
+      uniform vec2 sizeFisheye, focalFisheye, offsetFisheye;
+      uniform float k1, k2, xi, opacity;
+
+      void main() {
+
+          vec2 p = vUv;
+
+           // step1: convert to unit cs
+          p.x = (p.x*sizeVirtual.x - offsetVirtual.x)/focalVirtual.x;
+          p.y = ((1.0-p.y)*sizeVirtual.y - offsetVirtual.y)/focalVirtual.y;
+
+          // step2: 
+          vec2 q = p; 
+          p.x /= 1.0 + xi*sqrt(1.0+q.x*q.x+q.y*q.y);
+          p.y /= 1.0 + xi*sqrt(1.0+q.x*q.x+q.y*q.y);
+
+          // step3:
+          float rho2 = p.x*p.x + p.y*p.y;
+          p.x *= 1.0 + k1*rho2 + k2*rho2*rho2;
+          p.y *= 1.0 + k1*rho2 + k2*rho2*rho2;
+
+           //step4:
+          p.x = p.x* focalFisheye.x + offsetFisheye.x;
+          p.y = p.y* focalFisheye.y + offsetFisheye.y;
+
+          //step5: convert to [0, 1]
+          p.x /= sizeFisheye.x;
+          p.y /= sizeFisheye.y;
+          p.y = 1.0 - p.y;
+
+          vec4 pixel = texture2D(texture, p);
+          gl_FragColor =  vec4( pixel.x, pixel.y, pixel.z, opacity);
+      }
+  </script>
+
+	<script>
+		// get user and task
+		var taskId = '{{ task }}';
+		var userId = '{{ user }}';
+		var isAdmin = '{{ isadmin }}';
+		var timerOffset = '{{ timer }}';
+		var isGtTask = '{{ isgttask }}';
+		var refinemode = '{{ refinemode }}';
+		var userDrawnDataUrl;
+		var readOnly = 0
+		if ('{{ editable }}' == 'readonly') {
+			readOnly = 1;
+		}
+		else if ('{{ editable }}' == 'playground') {
+			readOnly = 2;
+		}
+
+		if ( '{{refinemode}}' == 'normal' ){
+	 	    if (!'{{ version }}') {
+	 	    	if (readOnly == 0) {
+	 	    		userDrawnDataUrl = '/static/results/' + userId + '/' + taskId + '.xml';
+	 	    	}
+	 	    	else {
+	 	    		userDrawnDataUrl = '/static/results/shared/' + taskId + '.xml';
+	 	    	}
+	 	    }
+	 	    else {
+	 	    	userDrawnDataUrl = '/static/backup/' + userId + '/' + taskId + '/' + '{{ version }}' + '.xml';	
+	 	    }
+		}else{
+	 	    userDrawnDataUrl = '/static/refine/' + taskId + '.xml';
+		}
+
+	 	// TODO: change readonly
+
+	</script>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+	<script data-turbolinks-track="true" src="../../assets/javascripts/build_js/three.js?body=1"></script>
+	  
+	<script data-turbolinks-track="true" src="../../assets/javascripts/src/style.js?body=1"></script>	
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/controls/OrthographicTrackballControls.js?body=1"></script>
+
+	<script data-turbolinks-track="true" src="../../assets/javascripts/js/TypedArrayUtils.js?body=1"></script>
+
+    <script data-turbolinks-track="true" src="../../assets/javascripts/src/style.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/controls/TrackballControls.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/controls/OrthographicControl.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/controls/OrbitControls.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/controls/TransformControls.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/controls/Coordinates.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/loaders/PLYLoader.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/Detector.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/libs/stats.min.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/loaders/loadXMLDoc.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/build_js/FileSaver.min.js?body=1"></script>
+
+    <script data-turbolinks-track="true" src="../../assets/javascripts/js/libs/dat.gui.js?body=1"></script>
+	<script data-turbolinks-track="true" src="../../assets/javascripts/src/config.js?body=1"></script>
+
+    <script data-turbolinks-track="true" src="../../assets/javascripts/src/processing.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/src/labelingGame.js?body=1"></script>
+    <script data-turbolinks-track="true" src="../../assets/javascripts/src/utils.js?body=1"></script>
+ <!--    <script data-turbolinks-track="true" src="../../assets/javascripts/src/refining.js?body=1"></script> -->
+
+    <script>
+		// beginning of rendering
+		/*-----------------------------------------------------------------------------------------*/
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			startApp();
+
+	</script>
+
+</body>
+</html>

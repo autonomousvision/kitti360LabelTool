@@ -1,0 +1,20 @@
+[global]
+server.socket_host = "127.0.0.1"
+server.socket_port = 8080
+
+[/]
+tools.sessions.on = True
+tools.staticdir.root = os.getcwd()
+
+[/static]
+tools.staticdir.on = True
+tools.staticdir.dir = "./public"
+
+[/views]
+tools.staticdir.on = True,
+tools.staticdir.dir = "./views"
+auth.require = []
+
+[/assets]
+tools.staticdir.on = True,
+tools.staticdir.dir = "./assets"

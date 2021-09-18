@@ -1,0 +1,7 @@
+/public/backup/**
+/public/results/**
+*.pyc
+/public/data/**
+/db/**
+/db_import/*.txt
+server.conf

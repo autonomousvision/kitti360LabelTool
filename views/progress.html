@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="../../static/resource/favicon.ico">
+	<link  rel="stylesheet" href="/assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/application.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <title>Progress</title>
+</head>
+
+<body>
+
+	<div class="container">
+    
+    <div class="row">
+      <p align="left" class="display">
+      User: {{ user }} | 
+      <a href = "/index"  class="top_menu">Go Back</a>
+      |
+      <a href = "/auth/logout"  class="top_menu">Logout</a>
+      </p> 
+	</div>
+ 
+	<!--Period Dropdown List-->
+	<div class="row">
+		<div class="col-sm-12">
+		<select class="form-control" id="period" onchange="change_status(this.value)">
+			<option {% if unit == 'W' %} selected {% endif %} value = "W">Week</option>
+			<option {% if unit == 'm' %} selected {% endif %} value = "m">Month</option>
+			<option {% if unit == 'all' %} selected {% endif %} value = "all">All</option>
+			<!-- <option value = "year">Year</option> -->
+		</select>
+		</div>
+	</div>
+
+	<br>
+
+	<!--Task Board-->
+	<div class="col-sm-12 well">
+	{% for l in progresses %}
+	<h4 style="padding-bottom:5px" class="text-info">{{ l['userid'] }}'s Progress</h4>
+		{% for progress in l['progresslist'] %}
+			<div class="row" style="padding-bottom:5px">
+				
+				<!--Progress Bar-->
+				<div class="col-sm-9" >
+					<div class="progress">
+					  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="70"
+					  aria-valuemin="0" aria-valuemax="100" style="width:{{progress['percentage']}}%;color:#000">
+					    {{progress['display']}}
+					  </div>
+					</div>
+				</div>
+
+
+                <!--Time Period-->
+                <div class="col-sm-3" >
+                    {{progress['period']}}
+                </div>
+			
+			</div>
+
+		{% endfor %}
+	{% endfor %} 
+    </div>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript">
+
+
+	function change_status(value) 
+	{
+        if (window.location.href.indexOf("unit") < 0) {
+            window.location.href = window.location.href + "&unit="+ value;
+        }
+        else{
+            window.location.href = replaceUrlParam(window.location.href, "unit", value)
+        } 
+
+	}
+
+	function replaceUrlParam(url, paramName, paramValue)
+	{
+	    var pattern = new RegExp('\\b(' + paramName + '=).*?(&|$)')
+	    if (url.search(pattern) >= 0)
+	    {
+	        return url.replace(pattern, '$1' + paramValue + '$2');
+	    }
+	    return url + (url.indexOf('?') > 0 ? '&' : '?') + paramName + '=' + paramValue
+	}
+	</script>
+
+
+    
+    </div>
+
+</body>
+</html>
