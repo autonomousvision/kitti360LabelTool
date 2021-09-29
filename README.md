@@ -178,7 +178,13 @@ If you find this code helpful in your research, please use the following BibTeX 
 
 
 ```
-TBD
+@article{Liao2021ARXIV, 
+   title   = {{KITTI}-360: A Novel Dataset and Benchmarks for Urban Scene Understanding in 2D and 3D}, 
+   author  = {Yiyi Liao and Jun Xie and Andreas Geiger}, 
+   journal = {arXiv.org},
+   volume  = {2109.13410},
+   year    = {2021}, 
+}
 ```
 
 
