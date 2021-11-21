@@ -1107,13 +1107,13 @@ function setupKeyboard()
 	        /*---------------Translate-----------------*/
 	 		
 	 		/*---------------Rotation-----------------*/
-	 		case 69: // E
+	 		case 82: // R
 	            setControlCubes('rotate');
 	            break;
 	        /*---------------Rotation-----------------*/
 
 			/*---------------Scale-----------------*/
-			case 82: // R
+			case 69: // E
 	            setControlCubes('scale');
 	            break;
 			/*---------------Scale-----------------*/
