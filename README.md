@@ -1,6 +1,7 @@
 # KITTI-360 Annotation Tool
 
-KITTI-360 Annotation Tool is a framework that developed based on python(cherrypy + jinja2 + sqlite3) as the server end and javascript + WebGL as the front end. It is the annotation tool used to annotate the KITTI-360(TBD: paper link) dataset. 
+KITTI-360 Annotation Tool is a framework that developed based on python(cherrypy + jinja2 + sqlite3) as the server end and javascript + WebGL as the front end. It is the annotation tool used to annotate the [KITTI-360](https://arxiv.org/abs/2109.13410) dataset.
+Please find details of annotation instruction *[here](https://docs.google.com/document/d/1cXsJF59cwM2f9l6rH1UZSmdlBKWUfbmzTHoI8gyDm2g/edit?usp=sharing)*.
 
 
 <p align="center">
@@ -116,11 +117,7 @@ python labelApp.py
 ### 6. Load the web page
 Type _http://host:port_ in the browser to load the web page. For example in the demo the web app is started locally in _http://127.0.0.1:8080_.
 
-### 7. Play with the labeling interface
-Please find details of annotation instruction *[here](https://docs.google.com/document/d/1cXsJF59cwM2f9l6rH1UZSmdlBKWUfbmzTHoI8gyDm2g/edit?usp=sharing)*.
-
-
-### 8. Get annotation results
+### 7. Get annotation results
 Annotation results are saved in xml file under *public/results/*. We provide util functions to parse the xml file in https://github.com/autonomousvision/kitti360Scripts/blob/master/kitti360scripts/helpers/annotation.py#L353.
 
 
