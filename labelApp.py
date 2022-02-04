@@ -76,21 +76,21 @@ def parseTask(username, is_admin, mode, data, data_progress):
 			'first_frame': int(row[0][27:33])
 		} 
 	
-	user_id = row[1]
-	cherrypy.session[TASK_KEY]['%s_%s' % (m_task['name'], user_id)] = m_task['editable']
-	
-	if m_name in map:
-		lists[map[m_name]]['tasklist'].append(m_task)
-	else:
-		task_info = {
-			 'userid': m_name,
-			 'tasklist': [],
-		}
+	        user_id = row[1]
+	        cherrypy.session[TASK_KEY]['%s_%s' % (m_task['name'], user_id)] = m_task['editable']
+	        
+	        if m_name in map:
+	        	lists[map[m_name]]['tasklist'].append(m_task)
+	        else:
+	        	task_info = {
+	        		 'userid': m_name,
+	        		 'tasklist': [],
+	        	}
 
-		task_info['tasklist'].append(m_task)
-		lists.append(task_info)
-		map[m_name] = index
-		index = len(lists)
+	        	task_info['tasklist'].append(m_task)
+	        	lists.append(task_info)
+	        	map[m_name] = index
+	        	index = len(lists)
 
 	return lists
 
