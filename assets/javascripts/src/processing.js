@@ -170,7 +170,8 @@ function initClassButton (classId) {
 				dynamic: 0,
 				dynamicSeq: -1,
 				dynamicIdx: -1,
-				timestamp: -1 
+				timestamp: -1,
+                                globalIndex: -1,
 			}
 
 

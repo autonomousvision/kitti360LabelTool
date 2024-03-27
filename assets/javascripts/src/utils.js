@@ -290,7 +290,11 @@ function writeData()
   // data content
   for (var i = 0; i < labels.length; i++) {
       str = str.concat('<object', (i+1).toString(), '>')  + '\n';                                             // header
-      str = str.concat('<index>', (i+1).toString(), '</index>')  + '\n';                                    // index
+      globalIdx = -1;
+      if (labels[i].name.globalIndex !== undefined){
+           globalIdx = labels[i].name.globalIndex.toString();
+      }
+      str = str.concat('<index>', globalIdx, '</index>')  + '\n';                                    // index
       str = str.concat('<label>', labels[i].name.label, '</label>')  + '\n';                                // label
       str = str.concat('<category>', labels[i].name.category, '</category>')  + '\n';                       // category
       str = str.concat('<level_min>', labels[i].name.level_min.toString(), '</level_min>')  + '\n';         // level_min
@@ -419,7 +423,8 @@ function loadXmlData(filename)
         dynamic: 0,
 	dynamicSeq: -1,
 	dynamicIdx: -1,
-	timestamp: -1 
+	timestamp: -1,
+        globalIndex: parseFloat(obj.getElementsByTagName('index')[0].childNodes[0].nodeValue),
       }
       if (typeof xmlDoc.getElementsByTagName('dynamic')[i] !== 'undefined') {
         info.dynamic = parseInt(xmlDoc.getElementsByTagName('dynamic')[i].childNodes[0].nodeValue);
